@@ -1,0 +1,18 @@
+LYFE Kitchen
+	Name: LYFE Kitchen
+	Phone: +1-650-325-5933
+	Address: 167 Hamilton Ave, Palo Alto, CA 94301
+	URL: http://www.yelp.com/biz/lyfe-kitchen-palo-alto
+
+La Bodeguita Del Medio
+	Name: La Bodeguita Del Medio
+	Phone: +1-650-326-7762
+	Address: 463 S California Ave, Palo Alto, CA 94306
+	URL: http://www.yelp.com/biz/la-bodeguita-del-medio-palo-alto
+
+Rangoon Ruby
+	Name: Rangoon Ruby
+	Phone: +1-650-323-6543
+	Address: 445 Emerson St, Palo Alto, CA 94301
+	URL: http://www.yelp.com/biz/rangoon-ruby-palo-alto
+
