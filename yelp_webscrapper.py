@@ -2,17 +2,14 @@
 
 import argparse
 import json
-import pprint
 import sys
 import urllib
 import urllib2
-import os
 
 import oauth2
 
 API_HOST = 'api.yelp.com'
 DEFAULT_LOCATION = 'Palo Alto, CA'
-DEFAULT_TERM = 'dinner'
 DEFAULT_FILE = 'input.txt'
 SEARCH_LIMIT = 5
 SEARCH_PATH = '/v2/search/'
@@ -78,7 +75,7 @@ def search(term, location):
 	Returns:
 		dict: The JSON response from the request.
 	"""
-    
+
 	url_params = {
 		'term': term.replace(' ', '+'),
 		'location': location.replace(' ', '+'),
@@ -89,7 +86,7 @@ def search(term, location):
 
 
 def get_business(business_id):
-	"""Query the Business API by a business ID.
+    	"""Query the Business API by a business ID.
 
 	Args:
 		business_id (str): The ID of the business to query.
@@ -97,7 +94,7 @@ def get_business(business_id):
 	Returns:
 		dict: The JSON response from the request.
 	"""
-	business_path = BUSINESS_PATH + business_id
+    	business_path = BUSINESS_PATH + business_id
 
 	return request(API_HOST, business_path)
 
@@ -120,26 +117,50 @@ def query_api(term, location):
 
 	business_id = businesses[0]['id']
 
-	# print u'{0} businesses found, querying business info for the top result "{1}" ...'.format(
-	# 	len(businesses),
-	# 	business_id
-	# )
-
 	response = get_business(business_id)
 
-	#print u'Result for business "{0}" found:'.format(business_id)
-	#pprint.pprint(response, indent=2)
-	return ("\tName: "+ response["name"] + '\n' 
-		"\tPhone: "+ response['display_phone'] + '\n'
-		"\tAddress: " + ', '.join(response['location']['display_address']) + "\n"
-		"\tURL: "+ response['url'] + '\n'
-		)
+	print response
 
+
+	try:
+		vname = response["name"]
+	except:
+		vname = term
+
+	try:
+		vphone = response['display_phone']
+	except:
+		vphone = "N/A"
+
+	try:
+		vaddress = ', '.join(response['location']['display_address'])
+	except:
+		vaddress = "N/A"
+
+	try:
+		vURL = response['url']
+	except:
+		vURL = "N/A"
+
+	try:
+		vList = response['categories']
+	except:
+		vList = "N/A"
+
+	if response is None:
+		vname = term
+		vphone = "N/A"
+		vaddress = "N/A"
+		vURL = "N/A"
+
+	return (vname,
+		vphone,
+		vaddress,
+		vURL,
+		vList)
 
 def main():
 	parser = argparse.ArgumentParser()
-
-	parser.add_argument('-q', '--term', dest='term', default=DEFAULT_TERM, type=str, help='Search term (default: %(default)s)')
 	parser.add_argument('-l', '--location', dest='location', default=DEFAULT_LOCATION, type=str, help='Search location (default: %(default)s)')
 	parser.add_argument('-f', '--file', dest='term', default=DEFAULT_FILE, type=str, help='Search term (default: %(default)s)')
 
@@ -147,23 +168,28 @@ def main():
 
 	in_txt = open(DEFAULT_FILE, "r")
 	out_txt = open("output.txt", "w")
-	
 
 	try:
-		#response = query_api(input_values.term, input_values.location)
 		if in_txt is not None:
 			for line in in_txt:
-				final = query_api(line, input_values.location)
-				#print line + " : " + final
-				out_txt.write(line + final + "\n")
-				
+				(fname, fphone, faddress, fURL,fList) = query_api(line, input_values.location)
+				out_txt.write(line)
+				out_txt.write("\t Name: " + fname + "\n")
+				out_txt.write("\t Phone: " + fphone + "\n")
+				out_txt.write("\t Address: " + faddress + "\n")
+				out_txt.write("\t URL: " + fURL + "\n")
+				str_temp = ''
+				for entry in fList:
+					str_temp += entry.pop(0) + ", "
+				out_txt.write("\t Categories: " + str_temp[:-2] + "\n")
 
 		print "PROGRAM END SUCCESS"
 
-		# print response 
-		# out_txt.write (response)
 	except urllib2.HTTPError as error:
 		sys.exit('Encountered HTTP error {0}. Abort program.'.format(error.code))
+
+	in_txt.close()
+	out_txt.close()
 
 
 if __name__ == '__main__':
